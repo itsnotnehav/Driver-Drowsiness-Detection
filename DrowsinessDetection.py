@@ -5,18 +5,14 @@ import numpy as np
 from pygame import mixer
 import time
 import os
-#os.environ['CUDA_VISIBLE_DEVICES'] = "0"
-
 
 mixer.init()
 sound = mixer.Sound('alarm.wav')
-
 face = cv2.CascadeClassifier('harcascade/haarcascade_frontalface_alt.xml')
 leye = cv2.CascadeClassifier('harcascade/haarcascade_lefteye_2splits.xml')
 reye = cv2.CascadeClassifier('harcascade/haarcascade_righteye_2splits.xml')
 
 lable = ['Close','Open']
-
 model = load_model('model.h5')
 path = os.getcwd()
 cap = cv2.VideoCapture(0)
@@ -31,9 +27,6 @@ while(True):
     
     ret, frame = cap.read()
     height, width = frame.shape[:2] 
-
-   # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-   # gray.shape
     faces = face.detectMultiScale(frame, minNeighbors = 5, scaleFactor = 1.1, minSize = (25, 25))
     left_eye = leye.detectMultiScale(frame)
     right_eye = reye.detectMultiScale(frame)
@@ -46,7 +39,6 @@ while(True):
     for (x, y, w, h) in right_eye :
         r_eye = frame[y : y + h, x : x + w]
         count = count + 1
-        #r_eye = cv2.cvtColor(r_eye,cv2.COLOR_BGR2GRAY)
         r_eye = cv2.resize(r_eye, (150, 150))
         r_eye = r_eye / 255
         r_eye = r_eye.reshape(150, 150, -1)
@@ -58,15 +50,11 @@ while(True):
             lable = 'Closed'
         #cv2.imwrite("debugging/RightEye-"+str(rpred[0])+lbl+".png",r_eye)
         #cv2.imwrite("Desktop/debugging/LeftEye-"+str(lpred[0])+lbl+".png",l_eye)
-
-
-        break
-    
+        break   
 
     for (x, y, w, h) in left_eye:
         l_eye = frame[y : y + h, x : x + w]
-        count = count + 1
-        #l_eye = cv2.cvtColor(l_eye,cv2.COLOR_BGR2GRAY)  
+        count = count + 1  
         l_eye = cv2.resize(l_eye, (150, 150))
         l_eye = l_eye / 255
         l_eye = l_eye.reshape(150, 150, -1)
@@ -93,14 +81,14 @@ while(True):
     if(score < 0) :
         score = 0   
     cv2.putText(frame,'Score:'+str(score), (100, height - 20), font, 1, (255, 255, 255), 1, cv2.LINE_AA)
-    if(score > 15) :
+    if(score > 5) :
         cv2.imwrite(os.path.join(path, 'image.jpg'), frame)
         try :
             sound.play()
             
         except :  
             pass
-        if(thicc<16) :
+        if(thicc<6) :
             thicc = thicc + 2
         else :
             thicc = thicc - 2
